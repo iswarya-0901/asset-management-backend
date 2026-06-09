@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Asset = require("../models/Asset");
+const Asset = require("../models/asset");
 const auth = require("../middleware/auth");
 const roleCheck = require("../middleware/role");
 // CREATE asset
