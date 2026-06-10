@@ -55,6 +55,7 @@ router.put("/book/:id", auth, async (req, res) => {
     if (qty > asset.quantity)
       return res.status(400).json({ message: `Only ${asset.quantity} available` });
     if (!asset.totalQuantity) asset.totalQuantity = asset.quantity; 
+    asset.bookedQuantity = qty;
     asset.quantity -= qty;
     if (asset.quantity === 0) asset.status = "booked";
 

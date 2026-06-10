@@ -16,9 +16,11 @@ const assetSchema = new mongoose.Schema({
     default: null,
   },
 
+  bookedQuantity: { type: Number, default: 0 },
+
   purpose: String,
   startDate: Date,
   endDate: Date,
 });
-
+ 
 module.exports = mongoose.model("Asset", assetSchema);
