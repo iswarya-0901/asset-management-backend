@@ -20,7 +20,7 @@ app.use(
 app.use(express.json());
 
 /* ================= ROUTES ================= */
-const authRoutes = require("./routes/authRoutes");
+const authRoutes = require("./routes/authroutes");
 const assetRoutes = require("./routes/assetRoutes");
 
 app.use("/api/auth", authRoutes);
