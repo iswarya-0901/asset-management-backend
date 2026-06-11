@@ -3,6 +3,7 @@ const router = express.Router();
 
 const Booking = require("../models/booking");
 const Asset = require("../models/asset");
+const AuditLog = require("../models/auditLog");
 const auth = require("../middleware/auth");
 const role = require("../middleware/role");
 
@@ -24,9 +25,7 @@ router.post("/", auth, async (req, res) => {
     if (isNaN(qty) || qty <= 0)
       return res.status(400).json({ message: "Invalid quantity" });
     if (qty > asset.quantity)
-      return res
-        .status(400)
-        .json({ message: `Only ${asset.quantity} units available` });
+      return res.status(400).json({ message: `Only ${asset.quantity} units available` });
 
     const booking = new Booking({
       asset: assetId,
@@ -103,18 +102,24 @@ router.put("/:id/approve", auth, role(["admin"]), async (req, res) => {
       });
     }
 
-    // Deduct quantity from asset
     asset.quantity -= booking.quantity;
     if (asset.quantity === 0) asset.status = "booked";
     await asset.save();
 
-    // Update booking
     booking.status = "approved";
     booking.reviewedBy = req.user.id;
     booking.reviewedAt = new Date();
     await booking.save();
-
     await booking.populate("bookedBy", "name email");
+
+    // Audit log
+    await AuditLog.create({
+      action: "BOOKING_APPROVED",
+      performedBy: req.user.id,
+      targetUser: booking.bookedBy._id,
+      asset: asset._id,
+      details: `Approved booking of ${booking.quantity} x ${asset.name}`,
+    });
 
     res.json({ message: "Booking approved", booking });
   } catch (err) {
@@ -141,6 +146,15 @@ router.put("/:id/reject", auth, role(["admin"]), async (req, res) => {
 
     await booking.populate("asset", "name type");
     await booking.populate("bookedBy", "name email");
+
+    // Audit log
+    await AuditLog.create({
+      action: "BOOKING_REJECTED",
+      performedBy: req.user.id,
+      targetUser: booking.bookedBy._id,
+      asset: booking.asset._id,
+      details: `Rejected booking of ${booking.quantity} x ${booking.asset.name}${reason ? `. Reason: ${reason}` : ""}`,
+    });
 
     res.json({ message: "Booking rejected", booking });
   } catch (err) {
