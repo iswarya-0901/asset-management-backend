@@ -14,26 +14,21 @@ app.use(
   })
 );
 
-/* ❌ REMOVE app.options("*", cors()) COMPLETELY */
-
 /* ================= MIDDLEWARE ================= */
 app.use(express.json());
 
 /* ================= ROUTES ================= */
 const authRoutes = require("./routes/authroutes");
 const assetRoutes = require("./routes/assetRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
+app.use("/api/bookings", bookingRoutes);
 
-/* ================= TEST ================= */
-app.get("/", (req, res) => {
-  res.send("Asset Management Backend Running");
-});
-
-app.get("/api/test", (req, res) => {
-  res.json({ message: "Backend working fine" });
-});
+/* ================= HEALTH ================= */
+app.get("/", (req, res) => res.send("Asset Management Backend Running"));
+app.get("/api/test", (req, res) => res.json({ message: "Backend working fine" }));
 
 /* ================= DB ================= */
 mongoose
