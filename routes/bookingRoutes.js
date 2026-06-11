@@ -6,6 +6,7 @@ const Asset = require("../models/asset");
 const AuditLog = require("../models/auditLog");
 const auth = require("../middleware/auth");
 const role = require("../middleware/role");
+const Allocation = require("../models/allocation");
 
 /* ================= CREATE BOOKING REQUEST (USER) ================= */
 router.post("/", auth, async (req, res) => {
@@ -66,7 +67,10 @@ router.get("/pending", auth, role(["admin"]), async (req, res) => {
       .populate("asset", "name type quantity")
       .populate("bookedBy", "name email")
       .sort({ createdAt: -1 });
-    res.json(bookings);
+
+    // Filter out bookings where the asset was deleted
+    const filtered = bookings.filter((b) => b.asset !== null);
+    res.json(filtered);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch pending bookings" });
   }
@@ -79,7 +83,10 @@ router.get("/all", auth, role(["admin"]), async (req, res) => {
       .populate("asset", "name type quantity")
       .populate("bookedBy", "name email")
       .sort({ createdAt: -1 });
-    res.json(bookings);
+
+    // Filter out bookings where the asset was deleted
+    const filtered = bookings.filter((b) => b.asset !== null);
+    res.json(filtered);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch all bookings" });
   }
@@ -112,6 +119,14 @@ router.put("/:id/approve", auth, role(["admin"]), async (req, res) => {
     await booking.save();
     await booking.populate("bookedBy", "name email");
 
+    await Allocation.create({
+      asset: asset._id,
+      allocatedTo: booking.bookedBy._id,
+      allocatedBy: req.user.id,
+      quantity: booking.quantity,
+      dueDate: booking.endDate,
+      status: "active",
+    });
     // Audit log
     await AuditLog.create({
       action: "BOOKING_APPROVED",

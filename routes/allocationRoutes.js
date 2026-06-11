@@ -58,19 +58,39 @@ router.post("/", auth, role(["admin"]), async (req, res) => {
 });
 
 /* ================= GET ALL ACTIVE ALLOCATIONS (ADMIN) ================= */
+/* ================= GET ALL ACTIVE ALLOCATIONS (ADMIN) ================= */
 router.get("/", auth, role(["admin"]), async (req, res) => {
   try {
+    const all = await Allocation.find();
+    console.log("TOTAL ALLOCATIONS IN DB:", all.length);
+    console.log("ALLOCATION DATA:", JSON.stringify(all, null, 2));
+
     const allocations = await Allocation.find({ status: "active" })
       .populate("asset", "name type")
       .populate("allocatedTo", "name email")
       .populate("allocatedBy", "name")
       .sort({ createdAt: -1 });
+
+    console.log("ACTIVE ALLOCATIONS:", allocations.length);
     res.json(allocations);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch allocations" });
+    console.log("ALLOC ERROR:", err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
+// TEMPORARY DEBUG ROUTE - remove after fixing
+router.get("/debug", auth, role(["admin"]), async (req, res) => {
+  try {
+    const all = await Allocation.find();
+    res.json({
+      total: all.length,
+      data: all
+    });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
 /* ================= MARK RETURNED (ADMIN) ================= */
 router.put("/:id/return", auth, role(["admin"]), async (req, res) => {
   try {
