@@ -21,10 +21,18 @@ app.use(express.json());
 const authRoutes = require("./routes/authroutes");
 const assetRoutes = require("./routes/assetRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const allocationRoutes = require("./routes/allocationRoutes");
+const userRoutes = require("./routes/userRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
+const auditLogRoutes = require("./routes/auditLogRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/allocations", allocationRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/audit-logs", auditLogRoutes);
 
 /* ================= HEALTH ================= */
 app.get("/", (req, res) => res.send("Asset Management Backend Running"));
