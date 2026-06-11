@@ -14,17 +14,17 @@ app.use(
   })
 );
 
-/* ❌ REMOVE app.options("*", cors()) COMPLETELY */
-
 /* ================= MIDDLEWARE ================= */
 app.use(express.json());
 
 /* ================= ROUTES ================= */
 const authRoutes = require("./routes/authroutes");
 const assetRoutes = require("./routes/assetRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 /* ================= TEST ================= */
 app.get("/", (req, res) => {
