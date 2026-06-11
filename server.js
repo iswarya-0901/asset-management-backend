@@ -26,14 +26,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/bookings", bookingRoutes);
 
-/* ================= TEST ================= */
-app.get("/", (req, res) => {
-  res.send("Asset Management Backend Running");
-});
-
-app.get("/api/test", (req, res) => {
-  res.json({ message: "Backend working fine" });
-});
+/* ================= HEALTH ================= */
+app.get("/", (req, res) => res.send("Asset Management Backend Running"));
+app.get("/api/test", (req, res) => res.json({ message: "Backend working fine" }));
 
 /* ================= DB ================= */
 mongoose

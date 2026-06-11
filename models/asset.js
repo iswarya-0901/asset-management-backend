@@ -3,24 +3,14 @@ const mongoose = require("mongoose");
 const assetSchema = new mongoose.Schema({
   name: String,
   type: String,
-  quantity: Number,
-  totalQuantity: Number,
+  quantity: Number,       // current available quantity
+  totalQuantity: Number,  // original total (set on creation)
   status: {
     type: String,
+    enum: ["available", "booked"],
     default: "available",
   },
-
-  bookedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null,
-  },
-
-  bookedQuantity: { type: Number, default: 0 },
-
-  purpose: String,
-  startDate: Date,
-  endDate: Date,
 });
+
  
 module.exports = mongoose.model("Asset", assetSchema);
